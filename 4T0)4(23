@@ -1,0 +1,46 @@
+(() => {
+    let letterLookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let output = "";
+
+    RPUI.use(["readingHeaders", "story"], mod => {
+        let storyData = mod.story.getStoryData();
+
+        for (questionIdx in storyData.questionList) {
+            let question = storyData.questionList[questionIdx];
+
+            output += "[" + (parseInt(questionIdx) + 1) + "] " + question.question + "\n";
+
+            if (question.type == 9) {
+                for (e of question.excerptList) {
+                    for (s of e.sectionList) {
+                        for (p of s.paragraphList) {
+                            for (c of p.sentenceList) {
+                                if (c.clue == true) {
+                                    for (w of c.words) {
+                                        output += w + " ";
+                                    }
+                                    output += "\n";
+                                }
+                            }
+                        }
+                    }
+                }
+                output += "\n";
+                continue;
+            }
+
+            let hashes = mod.readingHeaders.parseAndLogStudent(question);
+
+            for (h of question.b) {
+                let index = hashes.indexOf(h)
+                if (index != -1) {
+                    output += "[" + letterLookup[index] + "] " + question.answerList[index] + "\n";
+                }
+            }
+
+            output += "\n";
+        }
+    })
+
+    return output
+})()
